@@ -1,5 +1,5 @@
 # internship-native-JS-webpack
 
-start project:  
+to start the project:  
 npm install  
 npm run build or npm run dev  
