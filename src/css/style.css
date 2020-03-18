@@ -1,0 +1,202 @@
+:root {
+    --hover: #5F6F81;
+    --border: #C6D0DA;
+    --selected: #5993cd;
+    --gray-selected: #F5F5F5;
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+    font-size: 16px;
+    margin: 0;
+}
+
+.navigation {
+    display: flex;
+    width: 100%;
+    border-bottom: 1px solid var(--border);
+}
+
+.codrops, .demo  {
+    border-right: 1px solid var(--border);
+}
+
+.back {
+    margin-left: auto;
+    border-left: 1px solid var(--border);
+}
+
+.back, .demo, .codrops {
+    cursor: pointer;
+    padding: 20px 40px;
+}
+
+.back:hover, .demo:hover, .codrops:hover {
+    background-color: var(--hover);
+    color: white;
+}
+
+.menu-icon {
+    width: 30px;
+    padding: 15px;
+    cursor: pointer;
+    border-right: 1px solid var(--border);
+}
+
+.menu-icon:hover {
+    background-color: var(--hover);
+    color: white;
+}
+
+.bar {
+    position: fixed;
+    top: 63px;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.bar > div > svg {
+    padding-right: 25px;
+    padding-left: 3px;
+}
+
+.bar > div {
+    white-space: nowrap;
+    border-bottom: 1px solid var(--border);
+    padding: 15px 0 15px 0;
+    width: 0;
+    height: 22px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: width 0.5s, padding 0.5s;
+}
+
+div .vector, div .photoshop, div .articles, div .images, div .videos {
+    border: none;
+    height: 0;
+    padding: 0;
+    transition: height 0.5s, padding 0.5s;
+}
+
+.bar > div:hover {
+    color: white;
+    background-color: var(--hover);
+}
+
+.vector, .photoshop, .articles, .images, .videos {
+    color: var(--border);
+}
+
+.bar.over > div {
+    width: 30px !important;
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+}
+
+.bar.selected > div {
+    width: 250px !important;
+    padding: 15px !important;
+    height: 22px !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+.input-search {
+    color: inherit;
+    font-family: 'Lato', sans-serif;
+    font-size: 16px;
+    margin-left: -10px;
+    outline: none;
+    border: none;
+    border-radius: 10px;
+    padding-left: 10px;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.content {
+    margin-left: 350px;
+    margin-top: 30px;
+}
+
+.default-input {
+    width: 200px;
+    height: 15px;
+    font-size: 14px;
+    outline: none;
+    border: none;
+    border-bottom: 1px solid var(--selected);
+    margin-top: 10px;
+    padding-bottom: 5px;
+    padding-top: 5px;
+    padding-right: 20px;
+}
+
+.input-with-selection {
+    position: absolute;
+    top: 93px;
+    left: 806px;
+}
+
+.input-no-selection {
+    float: left;
+}
+
+.reset {
+    display: none;
+    width: 8px;
+    font-weight: bold;
+    position: relative;
+    top: -25px;
+    left: 208px;
+}
+
+.display-countries {
+    margin-top: -19px;
+    display: none;
+    min-width: 210px;
+    min-height: 25px;
+    max-height: 100px;
+    box-shadow: 0 0 5px 0 gray;
+    overflow-y: auto;
+}
+
+.display-countries .country {
+    display: flex;
+    margin-bottom: 5px;
+    padding: 5px;
+    cursor: pointer;
+}
+
+.display-countries .country:hover {
+    background-color: var(--gray-selected);
+}
+
+.display-countries .country:active {
+    background-color: #D6D6D6;
+}
+
+.display-countries .country .alt-name {
+    margin-left: auto;
+    padding-left: 10px;
+}
+
+.recently {
+    font-style: italic;
+    margin-left: auto;
+    color: #76A1FF;
+}
+
+.registration .save-no-selection {
+    position: absolute;
+    top: 124px;
+    left: 587px;
+    cursor: pointer;
+}
+
+.registration .save-with-selection {
+    position: absolute;
+    top: 124px;
+    left: 1043px;
+    cursor: pointer;
+}
+
