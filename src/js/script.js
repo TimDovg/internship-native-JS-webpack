@@ -1,4 +1,6 @@
 import '../css/style.css';
+import VirtualizedList from 'virtualized-list';
+import {debounce} from 'lodash';
 
 document.querySelector('main').innerHTML = `
 <div class="navigation">
@@ -171,7 +173,7 @@ const renderCountriesBySearch = (container, countries, countryName) => {
         selectedCountries.pop();
         container.innerHTML = ``;
         selectedCountries.forEach(country => {
-            if (re.test(country)) {
+            if (countryName === 'allDisplay' || re.test(country)) {
                 container.innerHTML += `
                     <div class="country">
                             <div class="name">${country}</div>
@@ -186,25 +188,13 @@ const renderCountriesBySearch = (container, countries, countryName) => {
                     <div class="alt-name">${country.altSpellings[0] || ''}</div>
                 </div>
             `);
+
+        container.style.display = 'block';
     }
 };
 
-const debounce = (f, ms) => {
-    let isCooldown = false;
-
-    return function() {
-        if (isCooldown) return;
-
-        f.apply(this, arguments);
-
-        isCooldown = true;
-
-        setTimeout(() => isCooldown = false, ms);
-    };
-
-};
-
-const renderCountriesBySearchDebounced = debounce(renderCountriesBySearch, 1000);
+// lodash.debounce
+const renderCountriesBySearchDebounce = debounce(renderCountriesBySearch, 500);
 
 document.querySelectorAll('.registration input').forEach(input => {
     const resetButton = input.parentNode.querySelector('.reset');
@@ -219,6 +209,8 @@ document.querySelectorAll('.registration input').forEach(input => {
         let country = input.value.trim();
         const container = input.parentNode.querySelector('.display-countries');
 
+        container.style.marginTop = '-19px';
+
         if (country === '') {
             resetButton.style.display = '';
             container.style.display = '';
@@ -230,9 +222,10 @@ document.querySelectorAll('.registration input').forEach(input => {
                 container.style.display = 'block';
 
                 if (countries.status === 404) {
+                    container.style.marginTop = '-19px';
                     container.innerHTML = `No options`;
                 } else {
-                    renderCountriesBySearchDebounced(container, countries, country);
+                    renderCountriesBySearchDebounce(container, countries, country);
                 }
             })
     })
@@ -281,11 +274,11 @@ document.querySelector('.save-with-selection').addEventListener('click', () => {
     fetch(`https://restcountries.eu/rest/v2/name/${countryName}`)
         .then(r => r.json())
         .then(response => {
-          if (response.status === 404) {
-              throw `${countryName} doesn't exist!`;
-          } else {
-              return response.map(country => country.name);
-          }
+            if (response.status === 404) {
+                throw `${countryName} doesn't exist!`;
+            } else {
+                return response.map(country => country.name);
+            }
         })
         .then(countries => {
             if (countries.includes(countryName)) {
@@ -303,4 +296,29 @@ document.querySelector('.save-with-selection').addEventListener('click', () => {
         .catch(err => console.log(err))
     ;
 });
+
+document.querySelectorAll('.registration input').forEach(input => input.addEventListener('click', () => {
+    let search = 'all';
+    const container = input.parentNode.querySelector('.display-countries');
+
+    if (input.value.trim() !== '') {
+        search = `name/${input.value.trim()}`;
+    } else {
+        container.style.marginTop = '';
+    }
+
+    fetch(`https://restcountries.eu/rest/v2/${search}`)
+        .then(r => r.json())
+        .then(countries => {
+            if (countries.status === 404) {
+                container.style.display = 'block';
+                container.style.marginTop = '-19px';
+                container.innerHTML = `No options`;
+                return;
+            }
+            countries = countries.slice(0, 30);
+            renderCountriesBySearchDebounce(container, countries, (search === 'all' ? 'allDisplay' : search));
+        })
+}
+));
 

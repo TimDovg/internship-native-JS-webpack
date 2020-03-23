@@ -153,7 +153,6 @@ div .vector, div .photoshop, div .articles, div .images, div .videos {
 }
 
 .display-countries {
-    margin-top: -19px;
     display: none;
     min-width: 210px;
     min-height: 25px;
