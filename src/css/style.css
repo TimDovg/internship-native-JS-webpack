@@ -144,7 +144,7 @@ div .vector, div .photoshop, div .articles, div .images, div .videos {
 }
 
 .reset {
-    display: none;
+    display: block;
     width: 8px;
     font-weight: bold;
     position: relative;
@@ -153,12 +153,18 @@ div .vector, div .photoshop, div .articles, div .images, div .videos {
 }
 
 .display-countries {
+    top: 150px;
+    position: absolute;
     display: none;
     min-width: 210px;
     min-height: 25px;
     max-height: 100px;
     box-shadow: 0 0 5px 0 gray;
     overflow-y: auto;
+}
+
+.input-with-selection + .display-countries {
+    left: 807px;
 }
 
 .display-countries .country {
@@ -200,4 +206,3 @@ div .vector, div .photoshop, div .articles, div .images, div .videos {
     left: 1043px;
     cursor: pointer;
 }
-

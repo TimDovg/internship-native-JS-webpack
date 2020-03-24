@@ -69,15 +69,17 @@ document.querySelector('main').innerHTML = `
                 Введите страну<br>
                 <input class="default-input">
                 <div class="reset">x</div>
-                <div class="display-countries"></div>
             </label>
+            <div class="display-countries no-selection"></div>
+            
             <button class="save-no-selection">Save</button>
             <label class="input-with-selection">
                 Выберите страну<br>
-                <input class="default-input">
+                <input class="default-input" placeholder="Select...">
                 <div class="reset">x</div>
-                <div class="display-countries"></div>
             </label>
+            <div class="display-countries with-selection"></div>
+         
             <button class="save-with-selection">Save</button>
         </div>
     </div>
@@ -159,7 +161,6 @@ void function content() {
 
     document.querySelectorAll('.reset').forEach(button => button.addEventListener('click', () => {
         button.parentNode.querySelector('input').value = '';
-        button.style.display = '';
         button.parentNode.querySelector('.display-countries').style.display = '';
     }));
 
@@ -206,37 +207,24 @@ void function content() {
             `);
             }
         } catch (err) {
-            container.style.marginTop = '-19px';
-            container.innerHTML = err;
+            container.innerHTML = `No options`;
         }
     };
 
     // debounced
     const renderCountriesBySearchDebounced = debounce(renderCountriesBySearch, 500);
 
-    document.querySelectorAll('.registration input').forEach(input => {
-        const resetButton = input.parentNode.querySelector('.reset');
+    document.querySelector('.input-no-selection input').addEventListener('keyup', () => {
+        const input = document.querySelector('.input-no-selection input');
+        let country = input.value.trim();
+        let container = document.querySelector('.no-selection');
 
-        input.addEventListener('keypress', () => {
-            if (!resetButton.style.display) {
-                resetButton.style.display = 'block';
-            }
-        });
+        if (country === '') {
+            container.style.display = '';
+            return;
+        }
 
-        input.addEventListener('keyup', () => {
-            let country = input.value.trim();
-            const container = input.parentNode.querySelector('.display-countries');
-
-            container.style.marginTop = '-19px';
-
-            if (country === '') {
-                resetButton.style.display = '';
-                container.style.display = '';
-                return;
-            }
-
-            renderCountriesBySearchDebounced(container, `name/${country}`)
-        })
+        renderCountriesBySearchDebounced(container, `name/${country}`)
     });
 
     window.addEventListener('click', e => {
@@ -250,7 +238,6 @@ void function content() {
     document.querySelectorAll('.display-countries').forEach(container =>
         container.addEventListener('click', e => {
             let countryName;
-            let input = container.parentNode.querySelector('input');
 
             if (e.target.classList.contains('name') || e.target.classList.contains('alt-name')) {
                 countryName = e.target.parentNode.querySelector('.name').innerHTML.trim();
@@ -258,7 +245,12 @@ void function content() {
                 countryName = e.target.querySelector('.name').innerHTML.trim();
             }
             if (countryName) {
-                input.value = countryName;
+                if (container.classList.contains('no-selection')) {
+                    document.querySelector('.input-no-selection input').value = countryName;
+                } else {
+                    document.querySelector('.input-with-selection input').value = countryName;
+                    document.querySelector('.input-with-selection input').myValue = countryName;
+                }
             }
         })
     );
@@ -301,17 +293,58 @@ void function content() {
         }
     });
 
-    document.querySelectorAll('.registration input').forEach(input => input.addEventListener('click', () => {
+    document.querySelector('.input-no-selection input').addEventListener('click', () => {
             let search = 'all';
-            const container = input.parentNode.querySelector('.display-countries');
+            const input = document.querySelector('.input-no-selection input');
+            const container = document.querySelector('.no-selection');
 
             if (input.value.trim() !== '') {
                 search = `name/${input.value.trim()}`;
-            } else {
-                container.style.marginTop = '';
             }
 
             renderCountriesBySearchDebounced(container, search);
         }
-    ));
+    );
+
+    document.querySelector('.input-with-selection input').addEventListener('click', () => {
+        const input = document.querySelector('.input-with-selection input');
+        const container = document.querySelector('.with-selection');
+
+        input.setSelectionRange(0,0);
+
+        renderCountriesBySearchDebounced(container, 'all');
+    });
+
+    document.querySelector('.input-with-selection input').addEventListener('keypress', () => {
+        const input = document.querySelector('.input-with-selection input');
+
+        input.style.color = 'black';
+        if (input.value.trim() === input.myValue || input.value.trim() === `Select...`) {
+            input.value = '';
+        }
+    });
+
+    document.querySelector('.input-with-selection input').addEventListener('keyup', () => {
+        const input = document.querySelector('.input-with-selection input');
+        const container = document.querySelector('.with-selection');
+
+        renderCountriesBySearchDebounced(container, `name/${input.value.trim()}`);
+    });
+
+    window.addEventListener('click', e => {
+       if (e.target instanceof HTMLHtmlElement) {
+           const input = document.querySelector('.input-with-selection input');
+           const container = document.querySelector('.with-selection');
+
+           if (input.myValue) {
+               input.value = input.myValue;
+               input.style.color = 'black';
+           } else {
+               input.value = `Select...`;
+               input.style.color = 'gray';
+           }
+
+           container.style.display = '';
+       }
+    });
 }();
