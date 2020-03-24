@@ -83,242 +83,235 @@ document.querySelector('main').innerHTML = `
     </div>
 `;
 
-// open menu
-document.querySelector('.bar').classList.add('selected');
-// recently countries
-if (!localStorage.getItem('selected-countries')) {
-    localStorage.setItem('selected-countries', '');
-}
+void function navigation() {
+    // open menu
+    document.querySelector('.bar').classList.add('selected');
 
-document.querySelector('.menu-icon').addEventListener('click', () => {
-    const bar = document.querySelector('.bar');
+    document.querySelector('.menu-icon').addEventListener('click', () => {
+        const bar = document.querySelector('.bar');
 
-    if (bar.classList.contains('selected')) {
-        bar.classList.remove('selected', 'over');
-        document.querySelector('.search').innerHTML = `
+        if (bar.classList.contains('selected')) {
+            bar.classList.remove('selected', 'over');
+            document.querySelector('.search').innerHTML = `
                 <i class="fas fa-search fa-lg"></i>
                 Search
             `;
-    } else {
-        bar.classList.add('selected');
-    }
-});
+        } else {
+            bar.classList.add('selected');
+        }
+    });
 
-document.querySelector('.menu-icon').onmouseover = () => {
-    const bar = document.querySelector('.bar');
+    document.querySelector('.menu-icon').onmouseover = () => {
+        const bar = document.querySelector('.bar');
 
-    if (!bar.classList.contains('over')) {
-        bar.classList.add('over');
-    }
+        if (!bar.classList.contains('over')) {
+            bar.classList.add('over');
+        }
 
-};
+    };
 
-document.querySelectorAll('.bar > div').forEach(div =>
-    div.onmouseover = () => document.querySelector('.bar').classList.add('selected')
-);
+    document.querySelectorAll('.bar > div').forEach(div =>
+        div.onmouseover = () => document.querySelector('.bar').classList.add('selected')
+    );
 
-document.querySelector('.menu-icon').onmouseout = () => {
-    const bar = document.querySelector('.bar');
+    document.querySelector('.menu-icon').onmouseout = () => {
+        const bar = document.querySelector('.bar');
 
-    if (bar.classList.contains('selected')) return;
+        if (bar.classList.contains('selected')) return;
 
-    bar.classList.remove('over');
-};
+        bar.classList.remove('over');
+    };
 
-document.querySelector('.search').addEventListener('click', e => {
-    const search = e.currentTarget;
+    document.querySelector('.search').addEventListener('click', e => {
+        const search = e.currentTarget;
 
-    if (search.querySelector('input')) return;
+        if (search.querySelector('input')) return;
 
-    search.innerHTML = `
+        search.innerHTML = `
         <i class="fas fa-search fa-lg"></i>
         <input class="input-search">
     `;
-    search.querySelector('input').focus();
-});
+        search.querySelector('input').focus();
+    });
 
-window.addEventListener('click', e => {
-    const bar = document.querySelector('.bar');
-    const menu = document.querySelector('.menu-icon');
+    window.addEventListener('click', e => {
+        const bar = document.querySelector('.bar');
+        const menu = document.querySelector('.menu-icon');
 
-    if (bar === e.target || bar === e.target.parentNode || bar === e.target.parentNode.parentNode) return;
-    if (menu === e.target || menu === e.target.parentNode || menu === e.target.parentNode.parentNode) return;
+        if (bar === e.target || bar === e.target.parentNode || bar === e.target.parentNode.parentNode) return;
+        if (menu === e.target || menu === e.target.parentNode || menu === e.target.parentNode.parentNode) return;
 
-    if (document.querySelector('.search')) {
-        document.querySelector('.search').innerHTML = `
+        if (document.querySelector('.search')) {
+            document.querySelector('.search').innerHTML = `
                 <i class="fas fa-search fa-lg"></i>
                 Search
             `;
+        }
+        bar.classList.remove('selected', 'over');
+    });
+}();
+
+void function content() {
+    // recently countries
+    if (!localStorage.getItem('selected-countries')) {
+        localStorage.setItem('selected-countries', '');
     }
-    bar.classList.remove('selected', 'over');
-});
 
-//content
-document.querySelectorAll('.reset').forEach(button => button.addEventListener('click', () => {
-    button.parentNode.querySelector('input').value = '';
-    button.style.display = '';
-    button.parentNode.querySelector('.display-countries').style.display = '';
-}));
+    document.querySelectorAll('.reset').forEach(button => button.addEventListener('click', () => {
+        button.parentNode.querySelector('input').value = '';
+        button.style.display = '';
+        button.parentNode.querySelector('.display-countries').style.display = '';
+    }));
 
-const getCountriesByString = str => fetch(`https://restcountries.eu/rest/v2/name/${str}`)
-    .then(r => r.json());
+    const getCountriesByString = async str => {
+        let response = await fetch(`https://restcountries.eu/rest/v2/${str}`);
+        let countries = await response.json();
 
-const renderCountriesBySearch = (container, countries, countryName) => {
-    if (countries.length === 0) {
-        container.innerHTML = `No options`;
-    } else {
-        const selectedCountries = localStorage.getItem('selected-countries').split('??');
-        const re = new RegExp(countryName, 'ig');
+        if (countries.status === 404) {
+            throw `No options`;
+        } else {
+            return countries;
+        }
+    };
 
-        selectedCountries.pop();
-        container.innerHTML = ``;
-        selectedCountries.forEach(country => {
-            if (countryName === 'allDisplay' || re.test(country)) {
-                container.innerHTML += `
+    const renderCountriesBySearch = async (container, countryName) => {
+        container.style.display = 'block';
+
+        try {
+            const countries = await getCountriesByString(countryName);
+
+            if (countries.length === 0) {
+                container.innerHTML = `No options`;
+            } else {
+                const selectedCountries = localStorage.getItem('selected-countries').split('??');
+                const re = new RegExp(countryName, 'ig');
+
+                selectedCountries.pop();
+                container.innerHTML = ``;
+                selectedCountries.forEach(country => {
+                    if (countryName === 'all' || re.test(country)) {
+                        container.innerHTML += `
                     <div class="country">
                             <div class="name">${country}</div>
                             <div class="recently">recently</div>
                         </div>
                 `;
-            }
-        });
-        countries.forEach(country => container.innerHTML += `
+                    }
+                });
+                countries.forEach(country => container.innerHTML += `
                 <div class="country">
                     <div class="name">${country.name}</div>
                     <div class="alt-name">${country.altSpellings[0] || ''}</div>
                 </div>
             `);
+            }
+        } catch (err) {
+            container.style.marginTop = '-19px';
+            container.innerHTML = err;
+        }
+    };
 
-        container.style.display = 'block';
-    }
-};
+    // debounced
+    const renderCountriesBySearchDebounced = debounce(renderCountriesBySearch, 500);
 
-// lodash.debounce
-const renderCountriesBySearchDebounce = debounce(renderCountriesBySearch, 500);
+    document.querySelectorAll('.registration input').forEach(input => {
+        const resetButton = input.parentNode.querySelector('.reset');
 
-document.querySelectorAll('.registration input').forEach(input => {
-    const resetButton = input.parentNode.querySelector('.reset');
+        input.addEventListener('keypress', () => {
+            if (!resetButton.style.display) {
+                resetButton.style.display = 'block';
+            }
+        });
 
-    input.addEventListener('keypress', () => {
-        if (!resetButton.style.display) {
-            resetButton.style.display = 'block';
+        input.addEventListener('keyup', () => {
+            let country = input.value.trim();
+            const container = input.parentNode.querySelector('.display-countries');
+
+            container.style.marginTop = '-19px';
+
+            if (country === '') {
+                resetButton.style.display = '';
+                container.style.display = '';
+                return;
+            }
+
+            renderCountriesBySearchDebounced(container, `name/${country}`)
+        })
+    });
+
+    window.addEventListener('click', e => {
+        const container = document.querySelectorAll('.display-countries');
+
+        if (!e.target.classList.contains('default-input')) {
+            container.forEach(container => container.style.display = '');
         }
     });
 
-    input.addEventListener('keyup', () => {
-        let country = input.value.trim();
-        const container = input.parentNode.querySelector('.display-countries');
+    document.querySelectorAll('.display-countries').forEach(container =>
+        container.addEventListener('click', e => {
+            let countryName;
+            let input = container.parentNode.querySelector('input');
 
-        container.style.marginTop = '-19px';
+            if (e.target.classList.contains('name') || e.target.classList.contains('alt-name')) {
+                countryName = e.target.parentNode.querySelector('.name').innerHTML.trim();
+            } else if (e.target.classList.contains('country')) {
+                countryName = e.target.querySelector('.name').innerHTML.trim();
+            }
+            if (countryName) {
+                input.value = countryName;
+            }
+        })
+    );
 
-        if (country === '') {
-            resetButton.style.display = '';
-            container.style.display = '';
+    document.querySelector('.save-no-selection').addEventListener('click', () => {
+        let selectedCountries = localStorage.getItem('selected-countries');
+        let countryName = document.querySelector('.input-no-selection input').value.trim();
+
+        if (!localStorage.getItem('selected-countries').split('??').includes(countryName)) {
+            selectedCountries += `${countryName}??`;
+            localStorage.setItem('selected-countries', selectedCountries);
+        }
+
+        console.log(`saved ${countryName}`);
+    });
+
+    document.querySelector('.save-with-selection').addEventListener('click', async () => {
+        let selectedCountries = localStorage.getItem('selected-countries');
+        let countryName = document.querySelector('.input-with-selection input').value.trim();
+        let response = await fetch(`https://restcountries.eu/rest/v2/name/${countryName}`);
+        let countries = await response.json();
+
+        if (countries.status === 404) {
+            console.log(`${countryName} doesn't exist!`);
             return;
         }
 
-        getCountriesByString(country)
-            .then(countries => {
-                container.style.display = 'block';
+        countries = countries.map(country => country.name);
 
-                if (countries.status === 404) {
-                    container.style.marginTop = '-19px';
-                    container.innerHTML = `No options`;
-                } else {
-                    renderCountriesBySearchDebounce(container, countries, country);
-                }
-            })
-    })
-});
-
-window.addEventListener('click', e => {
-    const container = document.querySelectorAll('.display-countries');
-
-    if (!e.target.classList.contains('display-countries') && !e.target.classList.contains('default-input')) {
-        container.forEach(container => container.style.display = '');
-    }
-});
-
-document.querySelectorAll('.display-countries').forEach(container =>
-    container.addEventListener('click', e => {
-        let countryName;
-        let input = container.parentNode.querySelector('input');
-
-        if (e.target.classList.contains('name') || e.target.classList.contains('alt-name')) {
-            countryName = e.target.parentNode.querySelector('.name').innerHTML.trim();
-        } else if (e.target.classList.contains('country')) {
-            countryName = e.target.querySelector('.name').innerHTML.trim();
-        }
-        if (countryName) {
-            input.value = countryName;
-        }
-    })
-);
-
-document.querySelector('.save-no-selection').addEventListener('click', () => {
-    let selectedCountries = localStorage.getItem('selected-countries');
-    let countryName = document.querySelector('.input-no-selection input').value.trim();
-
-    if (!localStorage.getItem('selected-countries').split('??').includes(countryName)) {
-        selectedCountries += `${countryName}??`;
-        localStorage.setItem('selected-countries', selectedCountries);
-    }
-
-    console.log(`saved ${countryName}`);
-});
-
-document.querySelector('.save-with-selection').addEventListener('click', () => {
-    let selectedCountries = localStorage.getItem('selected-countries');
-    let countryName = document.querySelector('.input-with-selection input').value.trim();
-
-    fetch(`https://restcountries.eu/rest/v2/name/${countryName}`)
-        .then(r => r.json())
-        .then(response => {
-            if (response.status === 404) {
-                throw `${countryName} doesn't exist!`;
-            } else {
-                return response.map(country => country.name);
-            }
-        })
-        .then(countries => {
-            if (countries.includes(countryName)) {
-                if (!localStorage.getItem('selected-countries').split('??').includes(countryName)) {
-                    selectedCountries += `${countryName}??`;
-                    localStorage.setItem('selected-countries', selectedCountries);
-                    console.log(`saved ${countryName}`);
-                } else {
-                    console.log(`passed ${countryName}, but already has been included`);
-                }
-            } else {
+        if (countries.includes(countryName)) {
+            if (!localStorage.getItem('selected-countries').split('??').includes(countryName)) {
+                selectedCountries += `${countryName}??`;
+                localStorage.setItem('selected-countries', selectedCountries);
                 console.log(`saved ${countryName}`);
+            } else {
+                console.log(`passed ${countryName}, but already has been included`);
             }
-        })
-        .catch(err => console.log(err))
-    ;
-});
+        } else {
+            console.log(`saved ${countryName}`);
+        }
+    });
 
-document.querySelectorAll('.registration input').forEach(input => input.addEventListener('click', () => {
-    let search = 'all';
-    const container = input.parentNode.querySelector('.display-countries');
+    document.querySelectorAll('.registration input').forEach(input => input.addEventListener('click', () => {
+            let search = 'all';
+            const container = input.parentNode.querySelector('.display-countries');
 
-    if (input.value.trim() !== '') {
-        search = `name/${input.value.trim()}`;
-    } else {
-        container.style.marginTop = '';
-    }
-
-    fetch(`https://restcountries.eu/rest/v2/${search}`)
-        .then(r => r.json())
-        .then(countries => {
-            if (countries.status === 404) {
-                container.style.display = 'block';
-                container.style.marginTop = '-19px';
-                container.innerHTML = `No options`;
-                return;
+            if (input.value.trim() !== '') {
+                search = `name/${input.value.trim()}`;
+            } else {
+                container.style.marginTop = '';
             }
-            countries = countries.slice(0, 30);
-            renderCountriesBySearchDebounce(container, countries, (search === 'all' ? 'allDisplay' : search));
-        })
-}
-));
 
+            renderCountriesBySearchDebounced(container, search);
+        }
+    ));
+}();
