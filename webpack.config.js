@@ -10,11 +10,12 @@ module.exports = {
     /*entry: './src/js/script.js',*/
     entry: {
         fontawesome: './js/fontawesome-all.min.js',
+        infoAboutCountry: './js/infoAboutCountry.js',
         main: './js/script.js'
     },
     output: {
         /*filename: '[name].bundle.js',*/
-        filename: '[name].[contenthash].js',
+        filename: '[name].js',
         path: path.resolve(__dirname, 'dist')
     },
     resolve: {
@@ -25,9 +26,6 @@ module.exports = {
         }
     },
     optimization: {
-        splitChunks: {
-            chunks: 'all'
-        },
         minimizer: [
             // we specify a custom UglifyJsPlugin here to get source maps in production
             new UglifyJsPlugin({
@@ -47,8 +45,14 @@ module.exports = {
     },
     plugins: [
         new HTMLWebpackPlugin({
-            /*title: 'Native JS',*/
-            template: './index.html'
+            filename: 'index.html',
+            template: './index.html',
+            inject: false
+        }),
+        new HTMLWebpackPlugin({
+            filename: 'info-about-country.html',
+            template: './html/info-about-country.html',
+            inject: false
         }),
         new CleanWebpackPlugin(),
         new LodashModuleReplacementPlugin({

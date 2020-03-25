@@ -182,18 +182,24 @@ void function content() {
             if (country.name) {
                 container.innerHTML += `
                             <div class="country">
-                                <div class="name">${country.name}</div>
+                                <a href="info-about-country.html"><div title="Info about ${country.name}" class="name">${country.name}</div></a>
                                 <div class="alt-name">${country.altSpellings[0] || ''}</div>
                             </div>
-                            `
+                            `;
             } else {
                 container.innerHTML += `
                             <div class="country">
-                                <div class="name">${country}</div>
+                                <a href="info-about-country.html"><div title="Info about ${country}" class="name">${country}</div></a>
                                 <div class="recently">recently</div>
                             </div>
                          `;
             }
+            // checkout to info about country
+            document.querySelectorAll('.name').forEach(divName => divName.addEventListener('click', () => {
+                const country = divName.innerText.trim();
+
+                localStorage.setItem('infoAboutCountry', country);
+            }));
         });
     };
 

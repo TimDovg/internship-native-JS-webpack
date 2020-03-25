@@ -206,3 +206,11 @@ div .vector, div .photoshop, div .articles, div .images, div .videos {
     left: 1043px;
     cursor: pointer;
 }
+
+.name:hover {
+    text-decoration: underline darkslateblue;
+}
+
+a {
+    color: black;
+}
