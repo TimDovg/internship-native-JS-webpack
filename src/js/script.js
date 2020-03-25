@@ -1,5 +1,4 @@
 import '../css/style.css';
-import VirtualizedList from 'virtualized-list';
 import {debounce} from 'lodash';
 
 document.querySelector('main').innerHTML = `
@@ -175,36 +174,50 @@ void function content() {
         }
     };
 
-    const renderCountriesBySearch = async (container, countryName) => {
+    const pushCountriesAtContainer = (container, countries) => {
+        const max = container.max;
+        const min = container.min;
+
+        countries.slice(min, max).forEach(country => {
+            if (country.name) {
+                container.innerHTML += `
+                            <div class="country">
+                                <div class="name">${country.name}</div>
+                                <div class="alt-name">${country.altSpellings[0] || ''}</div>
+                            </div>
+                            `
+            } else {
+                container.innerHTML += `
+                            <div class="country">
+                                <div class="name">${country}</div>
+                                <div class="recently">recently</div>
+                            </div>
+                         `;
+            }
+        });
+    };
+
+    const renderCountriesBySearch = async (container, countryName, quantity) => {
         container.style.display = 'block';
 
         try {
-            const countries = await getCountriesByString(countryName);
+            let countries = await getCountriesByString(countryName);
+
+            if (quantity) {
+                countries = countries.slice(0, quantity);
+            }
 
             if (countries.length === 0) {
                 container.innerHTML = `No options`;
             } else {
                 const selectedCountries = localStorage.getItem('selected-countries').split('??');
-                const re = new RegExp(countryName, 'ig');
+                const re = new RegExp(countryName.slice(5), 'ig');
 
                 selectedCountries.pop();
                 container.innerHTML = ``;
-                selectedCountries.forEach(country => {
-                    if (countryName === 'all' || re.test(country)) {
-                        container.innerHTML += `
-                    <div class="country">
-                            <div class="name">${country}</div>
-                            <div class="recently">recently</div>
-                        </div>
-                `;
-                    }
-                });
-                countries.forEach(country => container.innerHTML += `
-                <div class="country">
-                    <div class="name">${country.name}</div>
-                    <div class="alt-name">${country.altSpellings[0] || ''}</div>
-                </div>
-            `);
+                countries = [...selectedCountries.filter(country => countryName === 'all' || re.test(country)), ...countries];
+                pushCountriesAtContainer(container, countries);
+                document.querySelector('.with-selection').countries = countries;
             }
         } catch (err) {
             container.innerHTML = `No options`;
@@ -306,13 +319,15 @@ void function content() {
         }
     );
 
+    // второй инпут
     document.querySelector('.input-with-selection input').addEventListener('click', () => {
         const input = document.querySelector('.input-with-selection input');
         const container = document.querySelector('.with-selection');
 
-        input.setSelectionRange(0,0);
-
-        renderCountriesBySearchDebounced(container, 'all');
+        input.setSelectionRange(0, 0);
+        container.min = 0;
+        container.max = 10;
+        renderCountriesBySearchDebounced(container, 'all', 30);
     });
 
     document.querySelector('.input-with-selection input').addEventListener('keypress', () => {
@@ -328,23 +343,36 @@ void function content() {
         const input = document.querySelector('.input-with-selection input');
         const container = document.querySelector('.with-selection');
 
+        container.min = 0;
+        container.max = 10;
+        container.scrollTop = 0;
         renderCountriesBySearchDebounced(container, `name/${input.value.trim()}`);
     });
 
     window.addEventListener('click', e => {
-       if (e.target instanceof HTMLHtmlElement) {
-           const input = document.querySelector('.input-with-selection input');
-           const container = document.querySelector('.with-selection');
+        if (e.target instanceof HTMLHtmlElement) {
+            const input = document.querySelector('.input-with-selection input');
+            const container = document.querySelector('.with-selection');
 
-           if (input.myValue) {
-               input.value = input.myValue;
-               input.style.color = 'black';
-           } else {
-               input.value = `Select...`;
-               input.style.color = 'gray';
-           }
+            if (input.myValue) {
+                input.value = input.myValue;
+                input.style.color = 'black';
+            } else {
+                input.value = `Select...`;
+                input.style.color = 'gray';
+            }
 
-           container.style.display = '';
-       }
+            container.style.display = '';
+        }
+    });
+
+    document.querySelector('.with-selection').addEventListener('scroll', e => {
+        const container = document.querySelector('.with-selection');
+
+        if (container.scrollHeight === Math.round(container.scrollTop) + 100) {
+            container.min = container.max + 1;
+            container.max += 11;
+            pushCountriesAtContainer(container, container.countries);
+        }
     });
 }();
