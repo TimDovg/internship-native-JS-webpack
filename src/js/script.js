@@ -165,8 +165,8 @@ void function content() {
     }));
 
     const getCountriesByString = async str => {
-        let response = await fetch(`https://restcountries.eu/rest/v2/${str}`);
-        let countries = await response.json();
+        const response = await fetch(`https://restcountries.eu/rest/v2/${str}`);
+        const countries = await response.json();
 
         if (countries.status === 404) {
             throw `No options`;
@@ -216,8 +216,8 @@ void function content() {
 
     document.querySelector('.input-no-selection input').addEventListener('keyup', () => {
         const input = document.querySelector('.input-no-selection input');
-        let country = input.value.trim();
-        let container = document.querySelector('.no-selection');
+        const country = input.value.trim();
+        const container = document.querySelector('.no-selection');
 
         if (country === '') {
             container.style.display = '';
@@ -257,7 +257,7 @@ void function content() {
 
     document.querySelector('.save-no-selection').addEventListener('click', () => {
         let selectedCountries = localStorage.getItem('selected-countries');
-        let countryName = document.querySelector('.input-no-selection input').value.trim();
+        const countryName = document.querySelector('.input-no-selection input').value.trim();
 
         if (!localStorage.getItem('selected-countries').split('??').includes(countryName)) {
             selectedCountries += `${countryName}??`;
@@ -269,8 +269,8 @@ void function content() {
 
     document.querySelector('.save-with-selection').addEventListener('click', async () => {
         let selectedCountries = localStorage.getItem('selected-countries');
-        let countryName = document.querySelector('.input-with-selection input').value.trim();
-        let response = await fetch(`https://restcountries.eu/rest/v2/name/${countryName}`);
+        const countryName = document.querySelector('.input-with-selection input').value.trim();
+        const response = await fetch(`https://restcountries.eu/rest/v2/name/${countryName}`);
         let countries = await response.json();
 
         if (countries.status === 404) {
