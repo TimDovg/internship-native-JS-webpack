@@ -1,0 +1,29 @@
+.country-info {
+    margin: 50px auto;
+    text-align: center;
+}
+
+.name {
+    font-size: 24px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.flag img {
+    width: 25px;
+    height: 25px;
+}
+
+td {
+    padding: 10px;
+}
+
+tbody {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loading {
+    font-size: 36px;
+}
