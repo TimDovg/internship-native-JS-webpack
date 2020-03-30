@@ -3,6 +3,7 @@ const HTMLWebpackPlugin = require('html-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {
     context: path.resolve(__dirname, 'src'),
@@ -26,19 +27,8 @@ module.exports = {
         }
     },
     optimization: {
-        minimizer: [
-            // we specify a custom UglifyJsPlugin here to get source maps in production
-            new UglifyJsPlugin({
-                cache: true,
-                parallel: true,
-                uglifyOptions: {
-                    compress: false,
-                    ecma: 6,
-                    mangle: true
-                },
-                sourceMap: true
-            })
-        ]
+        minimize: true,
+        minimizer: [new TerserPlugin()],
     },
     devServer: {
         port: 4200
@@ -58,15 +48,6 @@ module.exports = {
         new LodashModuleReplacementPlugin({
             'collections': true,
             'paths': true
-        }),
-        new UglifyJsPlugin({
-            uglifyOptions: {
-                warnings: false,
-                ie8: false,
-                output: {
-                    comments: false
-                }
-            }
         })
     ],
     module: {
