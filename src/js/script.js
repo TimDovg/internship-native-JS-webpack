@@ -81,6 +81,18 @@ document.querySelector('main').innerHTML = `
          
             <button class="save-with-selection">Save</button>
         </div>
+        <div class="multiply-choice">
+             <div class="header">Multiple choice:</div>
+             <div class="display">
+                 <div class="container"></div>
+                 <div class="options">
+                     <svg class="clean" height="20" width="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false" class="css-tj5bde-Svg"><path d="M14.348 14.849c-0.469 0.469-1.229 0.469-1.697 0l-2.651-3.030-2.651 3.029c-0.469 0.469-1.229 0.469-1.697 0-0.469-0.469-0.469-1.229 0-1.697l2.758-3.15-2.759-3.152c-0.469-0.469-0.469-1.228 0-1.697s1.228-0.469 1.697 0l2.652 3.031 2.651-3.031c0.469-0.469 1.228-0.469 1.697 0s0.469 1.229 0 1.697l-2.758 3.152 2.758 3.15c0.469 0.469 0.469 1.229 0 1.698z"></path></svg>
+                     <div class="slash"></div>
+                     <svg class="arrow" height="20" width="20" viewBox="0 0 20 20" aria-hidden="true" focusable="false" class="css-tj5bde-Svg"><path d="M4.516 7.548c0.436-0.446 1.043-0.481 1.576 0l3.908 3.747 3.908-3.747c0.533-0.481 1.141-0.446 1.574 0 0.436 0.445 0.408 1.197 0 1.615-0.406 0.418-4.695 4.502-4.695 4.502-0.217 0.223-0.502 0.335-0.787 0.335s-0.57-0.112-0.789-0.335c0 0-4.287-4.084-4.695-4.502s-0.436-1.17 0-1.615z"></path></svg>
+                 </div>
+             </div>
+             <div class="display-countries-multi"></div>
+        </div>
     </div>
 `;
 
@@ -372,13 +384,128 @@ void function content() {
         }
     });
 
-    document.querySelector('.with-selection').addEventListener('scroll', e => {
+    document.querySelector('.with-selection').addEventListener('scroll', () => {
         const container = document.querySelector('.with-selection');
 
         if (container.scrollHeight === Math.round(container.scrollTop) + 100) {
-            container.min = container.max + 1;
-            container.max += 11;
+            container.min = container.max;
+            container.max += 10;
             pushCountriesAtContainer(container, container.countries);
+        }
+    });
+}();
+
+void function multipleSelection() {
+    let allCountries;
+    const input = document.createElement('input');
+    const getAllCountries = async () => {
+        const r = await fetch('https://restcountries.eu/rest/v2/all');
+        const response = await r.json();
+
+        allCountries = response.map(country => country.name);
+        input.countries = allCountries;
+    };
+    const renderCountries = (container, countries) => {
+        const display = document.querySelector('.display-countries-multi');
+
+        container.innerHTML = ``;
+        countries.forEach(country => container.innerHTML += `<div class="display-countries-multi-country-name">${country}</div>`);
+        container.style.display = `flex`;
+
+        document.querySelectorAll('.multiply-choice .display-countries-multi-country-name').forEach(divName =>
+            divName.addEventListener('click', () => {
+                const name = divName.innerHTML.trim();
+                const id = name.replace(/\s/g, '-');
+
+                input.insertAdjacentHTML('beforebegin',
+                    `<div class="country-multi">
+                              <div class="name-multi">${name}</div>
+                              <div class="close ${id}"><svg height="14" width="14" viewBox="0 0 20 20" aria-hidden="true" focusable="false" class="css-tj5bde-Svg"><path d="M14.348 14.849c-0.469 0.469-1.229 0.469-1.697 0l-2.651-3.030-2.651 3.029c-0.469 0.469-1.229 0.469-1.697 0-0.469-0.469-0.469-1.229 0-1.697l2.758-3.15-2.759-3.152c-0.469-0.469-0.469-1.228 0-1.697s1.228-0.469 1.697 0l2.652 3.031 2.651-3.031c0.469-0.469 1.228-0.469 1.697 0s0.469 1.229 0 1.697l-2.758 3.152 2.758 3.15c0.469 0.469 0.469 1.229 0 1.698z"></path></svg></div>
+                           </div>`);
+                input.selectedCountries.push(name);
+                display.style.display = '';
+                input.value = '';
+                input.focus();
+
+                document.querySelector(`.multiply-choice .container .${id}`).addEventListener('click', e => {
+                    input.selectedCountries = input.selectedCountries.filter(country => country !== name);
+                    e.currentTarget.parentNode.remove();
+                });
+            })
+        );
+    };
+
+    const renderDefaultCountries = () => {
+        const displayContainer = document.querySelector('.multiply-choice .display-countries-multi');
+
+        input.value = '';
+        input.countriesCounter = 10;
+        input.countries = allCountries.filter(country => !input.selectedCountries.includes(country));
+        renderCountries(displayContainer, input.countries.slice(0, input.countriesCounter));
+        input.focus();
+        displayContainer.scrollTop = 0;
+    };
+
+    getAllCountries();
+    input.countriesCounter = 10;
+    input.selectedCountries = [];
+
+    document.querySelector('.multiply-choice .display').addEventListener('click', () => {
+        const display = document.querySelector('.multiply-choice .display');
+        const container = display.querySelector('.container');
+
+        if (!display.classList.contains('active')) {
+            display.classList.add('active');
+
+            if (!container.querySelector('input')) {
+                container.appendChild(input);
+            }
+        }
+
+        renderDefaultCountries();
+    });
+
+    document.querySelector('.multiply-choice .clean').addEventListener('click', () => {
+        const container = document.querySelector('.multiply-choice .container');
+
+        container.innerHTML = ``;
+        container.appendChild(input);
+    });
+
+    window.addEventListener('click', e => {
+        if (e.target instanceof HTMLHtmlElement) {
+            const display = document.querySelector('.multiply-choice .display');
+            const displayContainer = document.querySelector('.multiply-choice .display-countries-multi');
+
+            display.classList.remove('active');
+            input.remove();
+            displayContainer.style.display = '';
+        }
+    });
+
+    input.addEventListener('click', renderDefaultCountries);
+
+    input.addEventListener('keyup', () => {
+        const container = document.querySelector('.multiply-choice .display-countries-multi');
+        const value = input.value;
+        const re = new RegExp(value, 'ig');
+        const countries = allCountries.filter(country => re.test(country) && !input.selectedCountries.includes(country));
+
+        input.countriesCounter = 10;
+        input.countries = countries;
+        if (input.countries.length) {
+            renderCountries(container, input.countries.slice(0, input.countriesCounter));
+        } else {
+            container.innerHTML = `<div class="display-countries-multi-country-name">No options</div>`;
+        }
+    });
+
+    document.querySelector('.multiply-choice .display-countries-multi').addEventListener('scroll', () => {
+        const container = document.querySelector('.multiply-choice .display-countries-multi');
+
+        if (container.scrollHeight === Math.round(container.scrollTop) + 157) {
+            input.countriesCounter += 10;
+            renderCountries(container, input.countries.slice(0, input.countriesCounter));
         }
     });
 }();

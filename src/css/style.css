@@ -214,3 +214,121 @@ div .vector, div .photoshop, div .articles, div .images, div .videos {
 a {
     color: black;
 }
+
+.multiply-choice {
+    cursor: default;
+    font-weight: 600;
+    top: 90px;
+    right: 15px;
+    position: absolute;
+}
+
+.multiply-choice .header {
+    margin-bottom: 10px;
+}
+
+.multiply-choice .display {
+    display: flex;
+    align-items: center;
+    padding: 2px 5px;
+    border: 1px solid #CCCCCC;
+    border-radius: 5px;
+}
+
+.multiply-choice .country-multi {
+    display: flex;
+    width: fit-content;
+    background: #E6E6E6;
+    font-size: 14px;
+    margin: 3px;
+}
+
+.multiply-choice .close {
+    background: #E6E6E6;
+    padding: 5px 3px 3px 3px;
+}
+
+.multiply-choice .close:hover {
+    background: #FEBCAC;
+}
+
+.multiply-choice .close:hover svg{
+    fill: #DE350B;
+}
+
+.multiply-choice .name-multi {
+    padding: 3px 3px 3px 5px;
+}
+
+.multiply-choice .container {
+    width: 300px;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.multiply-choice .options {
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    align-self: stretch;
+}
+
+.multiply-choice .clean, .multiply-choice .arrow {
+    fill: #CCCCCC;
+}
+
+.multiply-choice .clean:hover, .multiply-choice .arrow:hover {
+    fill: #616161;
+}
+
+.multiply-choice .slash {
+    width: 1px;
+    align-self: stretch;
+    background: #CCCCCC;
+    margin: 5px 10px;
+}
+
+.multiply-choice .active {
+    box-shadow: 0 0 0 2px #2684FF;
+    /* чтобы не влияло на размеры контейнера */
+    border: 1px solid rgba(0, 0, 0, 0);
+}
+
+.multiply-choice .active .clean, .multiply-choice .active .arrow {
+    fill: #616161;
+}
+
+.multiply-choice .container input {
+    border: none;
+    outline: none;
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 2px 5px;
+    width: inherit;
+}
+
+.display-countries-multi {
+    display: none;
+    flex-direction: column;
+    padding: 5px 0;
+    width: 383px;
+    border: 1px solid #CCCCCC;
+    border-radius: 5px;
+    box-shadow: 0 0 10px 0 #E7E7E7;
+    margin-top: 5px;
+    max-height: 147px;
+    overflow: auto;
+}
+
+.display-countries-multi-country-name {
+    padding: 5px;
+}
+
+.display-countries-multi-country-name:hover {
+    background: #DEEBFF;
+}
+
+.display-countries-multi-country-name:active {
+    background: #B2D4FF;
+}
